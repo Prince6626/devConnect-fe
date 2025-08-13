@@ -25,7 +25,7 @@ const UserCard = ({ user, showButtons = true }) => {
 
   return (
     <motion.div
-      className="relative w-full max-w-[342px] mx-auto h-[500px] sm:h-[550px] md:h-[600px] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-b from-black/20 to-black/80 backdrop-blur-sm"
+      className="relative w-full max-w-[342px] mx-auto h-[500px] sm:h-[550px] md:h-[500px] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-b from-black/20 to-black/80 backdrop-blur-sm"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
@@ -80,7 +80,7 @@ const UserCard = ({ user, showButtons = true }) => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {skills.slice(0, 4).map((skill, index) => (
+            {skills.map((skill, index) => (
               <span
                 key={index}
                 className="px-2 sm:px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs sm:text-sm font-medium border border-white/30"
@@ -88,11 +88,6 @@ const UserCard = ({ user, showButtons = true }) => {
                 {skill}
               </span>
             ))}
-            {skills.length > 4 && (
-              <span className="px-2 sm:px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs sm:text-sm font-medium border border-white/20 text-gray-300">
-                +{skills.length - 4}
-              </span>
-            )}
           </motion.div>
         )}
 
