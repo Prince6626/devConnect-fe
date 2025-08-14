@@ -60,7 +60,7 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-[#121212] flex items-center justify-center py-8 px-4">
-      <div className="w-full max-w-4xl mx-auto h-[85vh] flex flex-col rounded-2xl bg-gray-800/50 backdrop-blur-md border border-gray-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+      <div className="w-full max-w-2xl mx-auto h-[88vh] flex flex-col rounded-md bg-gray-800/50 backdrop-blur-md border border-gray-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
         {/* Header */}
         <div className="bg-gray-800/60 backdrop-blur-sm p-6 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
@@ -112,7 +112,7 @@ const Chat = () => {
                 >
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-1 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-1 shadow-lg group-hover:scale-110 transition-transform duration-300">
                       <img
                         alt={`${msg.firstName}'s avatar`}
                         src={msg.photoUrl}
@@ -140,7 +140,7 @@ const Chat = () => {
 
                     {/* Message Bubble */}
                     <div
-                      className={`inline-block px-6 py-3 rounded-2xl max-w-full break-words shadow-lg transform transition-all duration-300 hover:shadow-xl relative ${
+                      className={`inline-block px-4 py-2 rounded-2xl max-w-full break-words shadow-lg transform transition-all duration-300 hover:shadow-xl relative ${
                         isCurrentUser
                           ? "bg-gradient-to-br from-blue-600/80 to-blue-700/80 text-white rounded-br-md border border-blue-500/50 backdrop-blur-md"
                           : "bg-gradient-to-br from-gray-700/50 to-gray-800/50 text-white rounded-bl-md border border-gray-600/50 backdrop-blur-md"
