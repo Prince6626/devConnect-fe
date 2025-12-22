@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -9,6 +9,12 @@ import { removeUser } from "../utils/userSlice";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
+  const notifications = useSelector((store) => store.notifications);
+
+  // Calculate total unread count
+  const totalUnread = useMemo(() => {
+    return Object.values(notifications).reduce((sum, count) => sum + count, 0);
+  }, [notifications]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -103,6 +109,7 @@ const NavBar = () => {
             <motion.div
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              className="relative"
             >
               <Link
                 to="/connections"
@@ -111,6 +118,19 @@ const NavBar = () => {
                 <Users className="w-4 h-4" />
                 <span className="text-sm font-medium">Connections</span>
               </Link>
+              {/* Notification Badge */}
+              {totalUnread > 0 && (
+                <motion.div
+                  className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center border-2 border-[#121212] shadow-lg"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                >
+                  <span className="text-white text-xs font-bold">
+                    {totalUnread > 9 ? "9+" : totalUnread}
+                  </span>
+                </motion.div>
+              )}
             </motion.div>
 
             <motion.div
@@ -171,13 +191,19 @@ const NavBar = () => {
                     <span>Feed</span>
                   </Link>
                 </motion.li>
-                <motion.li whileHover={{ x: 4, transition: { duration: 0.2 } }}>
+                <motion.li whileHover={{ x: 4, transition: { duration: 0.2 } }} className="relative">
                   <Link
                     to="/connections"
                     className="text-gray-300 hover:text-white hover:bg-green-600/20 rounded-xl p-3 flex items-center gap-3 transition-all duration-300"
                   >
                     <Users className="w-4 h-4" />
                     <span>Connections</span>
+                    {/* Mobile Notification Badge */}
+                    {totalUnread > 0 && (
+                      <span className="ml-auto badge badge-sm bg-gradient-to-br from-blue-500 to-blue-600 border-none text-white font-bold">
+                        {totalUnread > 9 ? "9+" : totalUnread}
+                      </span>
+                    )}
                   </Link>
                 </motion.li>
                 <motion.li whileHover={{ x: 4, transition: { duration: 0.2 } }}>

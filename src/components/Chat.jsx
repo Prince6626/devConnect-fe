@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { createSocketConnection } from "../utils/socket";
-import { useSelector } from "react-redux";
+import { getSocket } from "../utils/socket";
+import { useSelector, useDispatch } from "react-redux";
 import { BASE_URL } from "../utils/constance";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Send, MoreVertical, Phone, Video, Smile } from "lucide-react";
+import { clearNotification } from "../utils/notificationSlice";
 
 const Chat = () => {
   const { targetUserId } = useParams();
@@ -17,6 +18,7 @@ const Chat = () => {
 
   const user = useSelector((store) => store.user);
   const userId = user?._id;
+  const dispatch = useDispatch();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -61,10 +63,17 @@ const Chat = () => {
 
   useEffect(() => {
     fetchChatMessages();
+    
+    // Clear notifications for this user when entering chat
+    dispatch(clearNotification({ userId: targetUserId }));
   }, []);
 
   useEffect(() => {
-    const socket = createSocketConnection();
+    const socket = getSocket();
+    
+    // Register user connection
+    socket.emit("registerUser", { userId });
+    
     socket.emit("joinChat", { userId, targetUserId });
 
     socket.on("messageRecieved", ({ firstName, text, photoUrl }) => {
@@ -74,14 +83,15 @@ const Chat = () => {
     });
 
     return () => {
-      socket.disconnect();
+      // Don't disconnect the socket, just clean up listeners
+      socket.off("messageRecieved");
     };
   }, [userId, targetUserId]);
 
   const sendMessage = () => {
     if (!newMessage.trim()) return;
     
-    const socket = createSocketConnection();
+    const socket = getSocket();
     socket.emit("sendMessage", {
       firstName: user.firstName,
       photoUrl: user.photoUrl,

@@ -4,11 +4,15 @@ import { BASE_URL } from "../utils/constance";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 import { motion } from "framer-motion";
-import { Users, UserCheck, MessageCircle } from "lucide-react";
+import { Users, UserCheck, MessageCircle, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getSocket } from "../utils/socket";
+import { setNotifications } from "../utils/notificationSlice";
 
 const Connections = () => {
   const connections = useSelector((store) => store.connection);
+  const notifications = useSelector((store) => store.notifications);
+  const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const fetchConnections = async () => {
     try {
@@ -21,9 +25,39 @@ const Connections = () => {
     }
   };
 
+  const fetchUnreadCounts = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/chat/unread/all", {
+        withCredentials: true,
+      });
+      console.log("📥 Fetched unread counts from database:", res.data.unreadCounts);
+      // Set notifications from database
+      dispatch(setNotifications(res.data.unreadCounts));
+    } catch (err) {
+      console.log("Error fetching unread counts:", err);
+    }
+  };
+
   useEffect(() => {
     fetchConnections();
+    fetchUnreadCounts(); // Fetch persisted unread counts
   }, []);
+
+  // Register for notifications when user is available
+  useEffect(() => {
+    if (user?._id) {
+      const socket = getSocket();
+      console.log("📡 Registering user for notifications:", user._id);
+      socket.emit("registerUser", { userId: user._id });
+    } else {
+      console.log("⚠️ User not found, waiting for user data...");
+    }
+  }, [user]);
+
+  // Debug: Log notification state changes
+  useEffect(() => {
+    console.log("🔔 Notifications state updated:", notifications);
+  }, [notifications]);
 
   if (!connections) return;
   if (connections.length === 0) {
@@ -116,6 +150,20 @@ const Connections = () => {
                           alt={`${firstName} ${lastName}`}
                         />
                       </div>
+                      
+                      {/* Notification Badge */}
+                      {notifications[_id] && notifications[_id] > 0 && (
+                        <motion.div
+                          className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center border-2 border-gray-800 shadow-lg"
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                        >
+                          <span className="text-white text-xs font-bold">
+                            {notifications[_id] > 9 ? "9+" : notifications[_id]}
+                          </span>
+                        </motion.div>
+                      )}
                     </motion.div>
 
                     {/* Name */}
