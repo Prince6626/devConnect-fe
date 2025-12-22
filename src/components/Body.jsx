@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import NavBar from "./Navbar";
-import { Outlet, useNavigate } from "react-router-dom";
+import NavBar from "./NavBar";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Footer from "./Footer";
 import axios from "axios";
 import { BASE_URL } from "../utils/constance";
@@ -10,6 +10,7 @@ import { addUser } from "../utils/userSlice";
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const userData = useSelector((store) => store.user);
 
@@ -21,9 +22,8 @@ const Body = () => {
       });
       dispatch(addUser(res.data));
     } catch (err) {
-      if (err.status === 401) {
-        navigate("/login");
-      }
+      // Don't redirect to login automatically - let users see landing page
+      // Only redirect if they try to access protected routes
       console.log(err);
     }
   };
@@ -32,13 +32,23 @@ const Body = () => {
     fetchUser();
   }, []);
 
+  // Redirect authenticated users from landing page to feed
+  useEffect(() => {
+    if (userData && window.location.pathname === '/') {
+      navigate('/feed');
+    }
+  }, [userData, navigate]);
+
+  // Show footer only on landing and login pages (for unauthenticated users)
+  const showFooter = !userData && (location.pathname === '/' || location.pathname === '/landing' || location.pathname === '/login');
+
   return (
     <div className="flex flex-col min-h-screen">
       <NavBar />
       <main className="flex-grow">
         <Outlet />
       </main>
-      <Footer />
+      {showFooter && <Footer />}
     </div>
   );
 };
