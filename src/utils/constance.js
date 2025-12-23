@@ -1,1 +1,1 @@
-export const BASE_URL = "http://localhost:3000";
+export const BASE_URL = "https://devconnect-be-4h2d.onrender.com";
